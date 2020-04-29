@@ -59,6 +59,7 @@ void loop()
       }
     }
   */
+
   Wire.requestFrom(4, 6);
 
   while (Wire.available()) {
@@ -66,6 +67,7 @@ void loop()
       b[i] = Wire.read();
     }
   }
+
 
   for (int i = 0; i < 4; i++) {
     pos = b[0 + i * 3];
@@ -78,11 +80,14 @@ void loop()
     enc_val[i] += error[i];
     if (enc_val[i] > 180)
       enc_val[i] -= 360;
+    
     Serial.print(i);
     Serial.print(" - ");
     Serial.print(enc_val[i], 2);
     Serial.print(":::");
+    
   }
+  //Serial.print(b[6],HEX);
   Serial.println();
-  delay(5);
+  delay(1);
 }

@@ -1,5 +1,4 @@
-/*
- Example using the SparkFun HX711 breakout board with a scale
+/* Example using the SparkFun HX711 breakout board with a scale
  By: Nathan Seidle
  SparkFun Electronics
  Date: November 19th, 2014
@@ -33,8 +32,8 @@
 
 #include "HX711.h"
 
-#define DOUT  3
-#define CLK  2
+#define DOUT  23
+#define CLK  22
 
 HX711 scale;
 

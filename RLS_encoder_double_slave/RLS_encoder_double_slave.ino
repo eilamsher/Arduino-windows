@@ -2,21 +2,20 @@
 //#include <LiquidCrystal_I2C.h>
 //LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
 #define PPR17 131072.0
-
+/*
 union u_tag {
   float f_val;
   byte bytes[4];
 } u1, u2;
-
-int led = 13;
+*/
+//int led = 13;
 byte b[6];
-float enc_val_x, enc_val_y;
+//float enc_val_x, enc_val_y;
 
 // the setup routine runs once when you press reset:
 void setup() {
   Wire.begin(4);
   Wire.onRequest(requestEvent);
-  pinMode(led, OUTPUT);
   Serial2.begin(115200);
   Serial1.begin(115200);
 }
@@ -41,7 +40,7 @@ void loop() {
   }
   //u2.f_val = parse_bytes(1);
 }
-
+/*
 float parse_bytes(byte a) {
   long pos = b[0 + a];
   pos = (pos << 8);
@@ -52,19 +51,9 @@ float parse_bytes(byte a) {
   float pos_ang = pos * 360.0 / PPR17;
   return pos_ang;
 }
-
+*/
 void requestEvent() {
-  /*
-    for (int i = 0; i < 4; i++) {
-      Wire.write(u1.bytes[i]);
-    }
-    for (int i = 0; i < 4; i++) {
-      Wire.write(u2.bytes[i]);
-    }
-  */
-  digitalWrite(led, HIGH);
   for (int i = 0; i < 6; i++) {
     Wire.write(b[i]);
   }
-  digitalWrite(led, LOW);
 }
