@@ -1,59 +1,51 @@
 #include <Wire.h>
-//#include <LiquidCrystal_I2C.h>
-//LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
-#define PPR17 131072.0
-/*
-union u_tag {
-  float f_val;
-  byte bytes[4];
-} u1, u2;
-*/
-//int led = 13;
-byte b[6];
-//float enc_val_x, enc_val_y;
 
-// the setup routine runs once when you press reset:
+byte b[6], b_old[6], b5 = 125;
+bool read_done = 0, a = 0;
+
+void requestEvent() {
+  a = !a;
+  for (int i = 0; i < 6; i++)
+    Wire.write(b5);
+
+  /*
+    if (read_done)
+    for (int i = 0; i < 6; i++)
+      Wire.write(b[i]);
+    else
+    for (int i = 0; i < 6; i++)
+      Wire.write(b_old[i]);
+  */
+}
+
 void setup() {
   Wire.begin(4);
   Wire.onRequest(requestEvent);
   Serial2.begin(115200);
   Serial1.begin(115200);
+  pinMode(13, OUTPUT);
 }
 
-// the loop routine runs over and over again forever:
 void loop() {
-  Serial2.flush();
-  while (Serial2.available()) {
-    b[0] = Serial2.read();
-    b[1] = Serial2.read();
-    b[2] = Serial2.read();
-    break;
-  }
-  //u1.f_val = parse_bytes(0);
+  digitalWrite(13, a);
+  for (int i = 0; i < 6; i++)
+    b_old[i] = b[i];
 
+  read_done = 0;
   Serial1.flush();
   while (Serial1.available()) {
-    b[3] = Serial1.read();
-    b[4] = Serial1.read();
-    b[5] = Serial1.read();
+    b[0] = Serial1.read();
+    b[1] = Serial1.read();
+    b[2] = Serial1.read();
     break;
   }
-  //u2.f_val = parse_bytes(1);
-}
-/*
-float parse_bytes(byte a) {
-  long pos = b[0 + a];
-  pos = (pos << 8);
-  pos = pos | b[1 + a];
-  pos = (pos << 8);
-  pos = pos | b[2 + a];
-  pos = (pos >> 7);
-  float pos_ang = pos * 360.0 / PPR17;
-  return pos_ang;
-}
-*/
-void requestEvent() {
-  for (int i = 0; i < 6; i++) {
-    Wire.write(b[i]);
+
+  Serial2.flush();
+  while (Serial2.available()) {
+    b[3] = Serial2.read();
+    b[4] = Serial2.read();
+    b[5] = Serial2.read();
+    break;
   }
+  read_done = 1;
 }

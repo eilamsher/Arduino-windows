@@ -7,6 +7,8 @@
 
 //=====[ INCULDE ]==============================================================
 #include "RLS_Encoder.h"
+#define PPR17 131072.0
+
 //#include <ros.h>
 //#include <std_msgs/Float32MultiArray.h>
 //#include <i2c_t3.h>
@@ -25,6 +27,7 @@ RLS_Encoder enc;
 int bau = 57600;
 //ros::NodeHandle nh;
 byte data[4] = {0};
+byte b[3];
 //int value = 0;
 float enc1_val;
 //float arr[N_links]={0};
@@ -36,17 +39,17 @@ float enc1_val;
 //=====[ SETUP ]================================================================
 void setup() {
   int abc = 40000;
-  Serial.begin(abc); while (!Serial);
+  Serial.begin(115200); while (!Serial);
   //Serial.println("Start");
-  enc.begin(2*bau);
+  //enc.begin(115200);
   delay(5);
-  enc.set_read();
+  //enc.set_read();
   delay(5);
   //enc.set_baud(abc, 0);
   delay(5);
   //enc.begin(abc);
   delay(5);
-
+  Serial1.begin(115200);
 
 
   /*
@@ -75,19 +78,30 @@ void loop() {
 
   // Read first=this encoder position
 
-  Serial2.flush();
-  while (Serial2.available()) {
+  Serial1.flush();
+  while (Serial1.available()) {
     //if (Serial2.read()=='1'){
-    enc1_val = enc.get_pos();
-    
+    //enc1_val = enc.get_pos();
+    b[0] = Serial1.read();
+    b[1] = Serial1.read();
+    b[2] = Serial1.read();
     //if (enc1_val > 180.0)
-      //enc1_val -= 360.0;
+    //enc1_val -= 360.0;
     break;
   }
 
+  long pos = b[0];
+  pos = (pos << 8);
+  pos = pos | b[1];
+  pos = (pos << 8);
+  pos = pos | b[2];
+  pos = (pos >> 7);
+  enc1_val = pos * 360.0 / PPR17;
+
+
   Serial.print("val : ");            // uncomment this for printing
-  byte v = enc1_val;
-  Serial.println(enc1_val,2);           // uncomment this for printing
+//  byte v = enc1_val;
+  Serial.println(enc1_val, 2);          // uncomment this for printing
   delay(5);
 }
 //==============================================================================
