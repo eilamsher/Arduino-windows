@@ -41,15 +41,15 @@ void setup() {
   int abc = 40000;
   Serial.begin(115200); while (!Serial);
   //Serial.println("Start");
-  //enc.begin(115200);
+  enc.begin(115200);
   delay(5);
-  //enc.set_read();
+  enc.set_read();
   delay(5);
   //enc.set_baud(abc, 0);
   delay(5);
   //enc.begin(abc);
   delay(5);
-  Serial1.begin(115200);
+  //Serial1.begin(115200);
 
 
   /*
@@ -78,13 +78,13 @@ void loop() {
 
   // Read first=this encoder position
 
-  Serial1.flush();
-  while (Serial1.available()) {
+  Serial2.flush();
+  while (Serial2.available()) {
     //if (Serial2.read()=='1'){
     //enc1_val = enc.get_pos();
-    b[0] = Serial1.read();
-    b[1] = Serial1.read();
-    b[2] = Serial1.read();
+    b[0] = Serial2.read();
+    b[1] = Serial2.read();
+    b[2] = Serial2.read();
     //if (enc1_val > 180.0)
     //enc1_val -= 360.0;
     break;

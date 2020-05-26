@@ -129,6 +129,6 @@ void loop() {
   Serial.print("      val : ");            // uncomment this for printing
 //  byte v = enc1_val;
   Serial.println(enc1_val, 2);          // uncomment this for printing
-  delay(2);
+  delay(5);
 }
 //==============================================================================

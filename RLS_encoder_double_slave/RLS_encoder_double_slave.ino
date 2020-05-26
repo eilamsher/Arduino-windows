@@ -1,21 +1,17 @@
 #include <Wire.h>
 
-byte b[6], b_old[6], b5 = 125;
-bool read_done = 0, a = 0;
+byte b[6], b_old[6];
+bool read_done = 0, a = 1;
 
 void requestEvent() {
-  a = !a;
-  for (int i = 0; i < 6; i++)
-    Wire.write(b5);
-
-  /*
-    if (read_done)
+  //  a = !a;
+  if (read_done)
     for (int i = 0; i < 6; i++)
       Wire.write(b[i]);
-    else
+  else
     for (int i = 0; i < 6; i++)
       Wire.write(b_old[i]);
-  */
+
 }
 
 void setup() {
@@ -27,7 +23,7 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(13, a);
+//  digitalWrite(13, a);
   for (int i = 0; i < 6; i++)
     b_old[i] = b[i];
 

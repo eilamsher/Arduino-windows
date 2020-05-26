@@ -11,6 +11,11 @@
   Engine 7 - 22, QB3, QB2
   Engine 8 - 21, QB5, QB4
   Engine 9 - 20, QB7, QB6
+
+
+  Engines 0  1  2  /3  4  5  /6 7  8
+  Angle p 17 13 5  /25 33 21 /1 9  29
+  order   9  21 33 /5  17 29 /1 13 25
 */
 
 const int latchPin = 1; // (74HC595 pin 12)
@@ -18,8 +23,10 @@ const int clockPin = 2; // (74HC595 pin 11)
 const int dataPin = 0; //  (74HC595 pin 14)
 
 int data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, data2[9];
-byte step_size = 30, eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {2, 8, 6, 4, 5, 7, 3, 0, 1};
+byte step_size = 30, eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {7, 5, 4, 2, 0, 8, 6, 1, 3};
 bool dir[9], eng_dir[8], eng_spec_dir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+int j = 6;
 
 void setup() {
   Serial.begin(9600);
@@ -38,19 +45,32 @@ void setup() {
 
 void loop() {
   manual_control();
-  digitalWrite(latchPin, 0);
-  //try_arr();
+  //data[5]=30;
+  //data[6]=-250;
   motor_dir_shiftout(data);
-  for (int i = 0; i < 9; i++)
-    analogWrite(pwm_pins[i], abs(data[i]));
-  digitalWrite(latchPin, 1);
-  for (int i = 0; i < 9; i++) {
-    Serial.print(data[i]);
-    Serial.print(",");
-  }
-  Serial.println("");
   delay(50);
 
+/*
+  //data[5]=-30;
+  data[6]=-30;
+  motor_dir_shiftout(data);
+  delay(2000);
+
+  data[5]=0;
+  data[6]=0;
+  //j++;
+  motor_dir_shiftout(data);
+  delay(3000);
+
+  */
+  /*
+    for (int i = 0; i < 9; i++) {
+    Serial.print(data[i]);
+    Serial.print(",");
+    }
+    Serial.println("");
+    delay(50);
+  */
 }
 
 void engine_order_organize() {
@@ -78,6 +98,7 @@ void motor_dir_shiftout(int shift_data[]) {
   for (i = 4; i < 8; i++)
     eng_dir[i] = dir[i + 1];
 
+  digitalWrite(latchPin, 0);
   //clear everything out just in case to
   //prepare shift register for bit shifting
   digitalWrite(dataPin, 0);
@@ -90,6 +111,10 @@ void motor_dir_shiftout(int shift_data[]) {
   digitalWrite(clockPin, 0);
   digitalWrite(8, !dir[3]);
   digitalWrite(7, dir[3]);
+  digitalWrite(latchPin, 1);
+
+  for (int i = 0; i < 9; i++)
+    analogWrite(pwm_pins[i], abs(data[i]));
 }
 
 

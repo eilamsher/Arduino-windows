@@ -15,7 +15,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   //Serial.println(read_keypad());
   //Serial.print(read_keypad());
-  read_keypad2();
+  read_keypad();
   //print_arr();
   Serial.println("------------------------");
   delay(300);

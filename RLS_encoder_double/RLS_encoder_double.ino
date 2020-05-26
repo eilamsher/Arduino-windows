@@ -4,7 +4,7 @@
 int a = 0;
 byte b[12];
 //RLS_Encoder_Tiny enc;
-float enc_val[4], err[4] = {235.9, 36.6, 0, 247};
+float enc_val[4], err[4] = {0,0,0,0}; //{235.9, 36.6, 0, 247};
 
 // the setup routine runs once when you press reset:
 void setup() {
