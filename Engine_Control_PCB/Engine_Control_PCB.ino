@@ -22,9 +22,9 @@ const int latchPin = 1; // (74HC595 pin 12)
 const int clockPin = 2; // (74HC595 pin 11)
 const int dataPin = 0; //  (74HC595 pin 14)
 
-int data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, data2[9];
-byte step_size = 30, eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {7, 5, 4, 2, 0, 8, 6, 1, 3};
-bool dir[9], eng_dir[8], eng_spec_dir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int step_size = 30, data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, data2[9];
+byte eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {7, 5, 4, 2, 0, 8, 6, 1, 3};
+bool dir[9], eng_dir[8], eng_spec_dir[9] = {0, 1, 0, 0, 1, 0, 0, 1, 1};
 
 int j = 6;
 
@@ -32,7 +32,9 @@ void setup() {
   Serial.begin(9600);
   for (int i = 0; i < 9; i++) {
     pinMode(pwm_pins[i], OUTPUT);
+    //analogWriteFrequency(pwm_pins[i], 18000);
   }
+  //analogWriteResolution(12);
   pinMode(latchPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
@@ -45,22 +47,22 @@ void setup() {
 
 void loop() {
   manual_control();
-  //data[5]=30;
+  //data[0] = -20;
   //data[6]=-250;
   motor_dir_shiftout(data);
-  delay(50);
+  delay(20);
 
-/*
-  //data[5]=-30;
-  data[6]=-30;
-  motor_dir_shiftout(data);
-  delay(2000);
+  /*
+    //data[5]=-30;
+    data[6]=-30;
+    motor_dir_shiftout(data);
+    delay(2000);
 
-  data[5]=0;
-  data[6]=0;
-  //j++;
-  motor_dir_shiftout(data);
-  delay(3000);
+    data[5]=0;
+    data[6]=0;
+    //j++;
+    motor_dir_shiftout(data);
+    delay(3000);
 
   */
   /*
@@ -83,13 +85,15 @@ void motor_dir_shiftout(int shift_data[]) {
   int i;
 
   //get directions
-  for (i = 0; i < 9; i++)
+  for (i = 0; i < 9; i++) 
     dir[i] = shift_data[i] >= 0;
 
+
   //xor
-  for (i = 0; i < 9; i++)
+  for (i = 0; i < 9; i++) 
     dir[i] = !dir[i] != !eng_spec_dir[i];
 
+  
   //organize by engine order
   eng_dir[0] = dir[4];
   for (i = 1; i < 4; i++)
@@ -97,6 +101,8 @@ void motor_dir_shiftout(int shift_data[]) {
 
   for (i = 4; i < 8; i++)
     eng_dir[i] = dir[i + 1];
+
+
 
   digitalWrite(latchPin, 0);
   //clear everything out just in case to
@@ -108,6 +114,7 @@ void motor_dir_shiftout(int shift_data[]) {
     send_bit(eng_dir[i]);
   }
   //stop shifting
+
   digitalWrite(clockPin, 0);
   digitalWrite(8, !dir[3]);
   digitalWrite(7, dir[3]);

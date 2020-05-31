@@ -4,7 +4,7 @@
 int a = 0;
 byte b[12];
 //RLS_Encoder_Tiny enc;
-float enc_val[4], err[4] = {0,0,0,0}; //{235.9, 36.6, 0, 247};
+float enc_val[4], err[4] = { -123, 33.9, 71.5, -99.7}; //{235.9, 36.6, 0, 247};
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -13,7 +13,8 @@ void setup() {
   Serial2.begin(115200);
   Serial1.begin(115200);
   Serial.begin(115200);
-
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
 }
 
 // the loop routine runs over and over again forever:
@@ -34,7 +35,7 @@ void loop() {
     break;
   }
 
-  Wire.requestFrom(4, 6);
+  Wire.requestFrom(8, 6);
   while (Wire.available())
     for (int i = 6; i < 12; i++)
       b[i] = Wire.read();
@@ -50,12 +51,13 @@ void loop() {
     Serial.print(",");
   }
   Serial.println("");
-  for (int i = 6; i < 12; i++) {
+  /*
+    for (int i = 6; i < 12; i++) {
     Serial.print(b[i], HEX);
     Serial.print(",");
-  }
-  Serial.println("");
-  delay(500);
+    }
+    Serial.println("");*/
+  delay(5);
 }
 
 float parse_bytes(byte a) {
