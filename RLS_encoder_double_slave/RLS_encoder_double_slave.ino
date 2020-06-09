@@ -1,7 +1,9 @@
-#include <Wire.h>
+#include <i2c_t3.h>
+//#include <Wire.h>
 
 byte b[6], b_old[6];
 bool read_done = 0, a = 1;
+uint8_t slave_1 = 100;
 
 void requestEvent() {
   //  a = !a;
@@ -15,8 +17,12 @@ void requestEvent() {
 }
 
 void setup() {
-  Wire.begin(4);
+  Wire.begin(I2C_SLAVE, slave_1, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
+  delay(10);
   Wire.onRequest(requestEvent);
+  
+  //Wire.begin(4);
+  //Wire.onRequest(requestEvent);
   Serial2.begin(115200);
   Serial1.begin(115200);
   pinMode(13, OUTPUT);

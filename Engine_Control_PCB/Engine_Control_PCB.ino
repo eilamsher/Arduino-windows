@@ -23,7 +23,7 @@ const int clockPin = 2; // (74HC595 pin 11)
 const int dataPin = 0; //  (74HC595 pin 14)
 
 int step_size = 30, data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0}, data2[9];
-byte eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {7, 5, 4, 2, 0, 8, 6, 1, 3};
+byte eng_select = 0, temp_read, pwm_pins[] = {3, 4, 5, 6, 9, 23, 22, 21, 20}, eng_order[9] = {4, 7, 3, 8, 2, 1, 6, 0, 5}; //{7, 5, 4, 2, 0, 8, 6, 1, 3};
 bool dir[9], eng_dir[8], eng_spec_dir[9] = {0, 1, 0, 0, 1, 0, 0, 1, 1};
 
 int j = 6;
@@ -49,7 +49,22 @@ void loop() {
   manual_control();
   //data[0] = -20;
   //data[6]=-250;
-  motor_dir_shiftout(data);
+  engine_order_organize();
+  Serial.println("-----------");
+  for (int i = 0; i < 9; i++) {
+    Serial.print(data[i]);
+    Serial.print(",");
+  }
+  Serial.println("");
+  for (int i = 0; i < 9; i++) {
+    Serial.print(data2[i]);
+    Serial.print(",");
+  }
+  Serial.println("");
+
+  //motor_dir_shiftout(data);
+  motor_dir_shiftout(data2);
+
   delay(20);
 
   /*
@@ -85,15 +100,19 @@ void motor_dir_shiftout(int shift_data[]) {
   int i;
 
   //get directions
-  for (i = 0; i < 9; i++) 
+  for (i = 0; i < 9; i++)
     dir[i] = shift_data[i] >= 0;
 
+  for (int i = 0; i < 9; i++) {
+    Serial.print(dir[i]);
+    Serial.print(",");
+  }
+  Serial.println("");
 
   //xor
-  for (i = 0; i < 9; i++) 
+  for (i = 0; i < 9; i++)
     dir[i] = !dir[i] != !eng_spec_dir[i];
 
-  
   //organize by engine order
   eng_dir[0] = dir[4];
   for (i = 1; i < 4; i++)
@@ -121,7 +140,7 @@ void motor_dir_shiftout(int shift_data[]) {
   digitalWrite(latchPin, 1);
 
   for (int i = 0; i < 9; i++)
-    analogWrite(pwm_pins[i], abs(data[i]));
+    analogWrite(pwm_pins[i], abs(shift_data[i]));
 }
 
 
