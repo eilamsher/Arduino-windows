@@ -1,3 +1,4 @@
+
 #include <i2c_t3.h>
 #define PPR17 131072.0
 
@@ -11,8 +12,8 @@ void requestEvent(void);
 
 //------------Variables---------------
 byte b[6];
-float joint;
 long pos;
+float temp;
 
 //------------Setup---------------
 void setup()
@@ -24,6 +25,7 @@ void setup()
   // register events
   Wire.onRequest(requestEvent);
 
+  //Serial.begin(115200);
   Serial1.begin(115200);
   Serial2.begin(115200);
 }
@@ -52,10 +54,11 @@ void loop()
   pos = (pos << 8);
   pos = pos | b[2];
   pos = (pos >> 7);
-  joint = pos * 360.0 / PPR17;
-  u.fval[0] = joint;
+  temp = 246.0 + pos * 360.0 / PPR17;
+  if (temp > 180)
+    temp -= 360;
 
-
+  u.fval[0] = temp;
 
   pos = b[3];
   pos = (pos << 8);
@@ -63,10 +66,19 @@ void loop()
   pos = (pos << 8);
   pos = pos | b[5];
   pos = (pos >> 7);
-  u.fval[1] = pos * 360.0 / PPR17;
+  temp = 1.1 + pos * 360.0 / PPR17;
+  if (temp > 180)
+    temp -= 360;
 
+  u.fval[1] = temp;
+  /*
+    Serial.print(u.fval[0], 2);
+    Serial.print("-");
+    Serial.println(u.fval[1], 2);
+  */
   delay(1);
 }
+
 
 //
 // handle Tx Event (outgoing I2C data)

@@ -1,14 +1,18 @@
 #include <i2c_t3.h>
 #define PPR17 131072.0
 
-
 union u_tag {
   byte b[8];
   float fval[2];
 } u;
 
-byte b1[6], b2[6], b3[6];
-float first_joint[2];
+//------------Variables---------------
+byte b[6];
+float enc_val[6];
+long pos;
+uint8_t slave_add[2] = {0x66, 0x69}; // target Slave addresses
+
+//------------Setup---------------
 void setup()
 {
   // Setup for Master mode, pins 18/19, external pullups, 400kHz, 200ms default timeout
@@ -20,40 +24,69 @@ void setup()
   Serial2.begin(115200);
 }
 
+
+//------------Loop---------------
 void loop()
 {
-  uint8_t target = 0x66; // target Slave address
+  Serial1.flush();
+  while (Serial1.available()) {
+    b[0] = Serial1.read();
+    b[1] = Serial1.read();
+    b[2] = Serial1.read();
+    break;
+  }
+  Serial2.flush();
+  while (Serial2.available()) {
+    b[3] = Serial2.read();
+    b[4] = Serial2.read();
+    b[5] = Serial2.read();
+    break;
+  }
+
+  pos = b[0];
+  pos = (pos << 8);
+  pos = pos | b[1];
+  pos = (pos << 8);
+  pos = pos | b[2];
+  pos = (pos >> 7);
+  enc_val[0] = pos * 360.0 / PPR17;
+
+  pos = b[3];
+  pos = (pos << 8);
+  pos = pos | b[4];
+  pos = (pos << 8);
+  pos = pos | b[5];
+  pos = (pos >> 7);
+  enc_val[1] = pos * 360.0 / PPR17;
+
+
 
   digitalWrite(LED_BUILTIN, HIGH);  // LED on
 
   // Print message
   Serial.print("Reading from Slave: ");
 
-  // Read from Slave
-  Wire.requestFrom(target, 8); // Read from Slave (string len unknown, request full buffer)
+  for (int i = 0; i < 2; i++) {
+    // Read from Slave
+    Wire.requestFrom(slave_add[i], 8); // Read from Slave (string len unknown, request full buffer)
 
-  // Check if error occured
-  if (Wire.getError())
-    Serial.print("FAIL\n");
-  else
-  {
-    // If no error then read Rx data into buffer and print
+    // Check if error occured
+    if (Wire.getError())
+      Serial.println("FAIL\n");
+    else
+    {
+      // If no error then read Rx data into buffer and print
 
-    Wire.read(u.b, Wire.available());
+      Wire.read(u.b, Wire.available());
+      enc_val[2 * i + 2] = u.fval[0];
+      enc_val[2 * i + 3] = u.fval[1];
+      Serial.println(" OK\n");
 
-/*
-    long pos = b1[0];
-    pos = (pos << 8);
-    pos = pos | b1[1];
-    pos = (pos << 8);
-    pos = pos | b1[2];
-    pos = (pos >> 7);
-    float pos_ang = pos * 360.0 / PPR17;
-*/
-    Serial.println(" OK\n");
-    Serial.println(u.fval[0], 2);
-    Serial.println(u.fval[1], 2);
+    }
   }
+  for (int i = 0; i < 6; i++)
+    Serial.println(enc_val[i], 2);
+
 
   digitalWrite(LED_BUILTIN, LOW);   // LED off
   delay(100);                       // Delay to space out tests
