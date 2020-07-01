@@ -1,4 +1,3 @@
-
 #include <i2c_t3.h>
 #define PPR17 131072.0
 
@@ -21,7 +20,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT); // LED
   // Setup for Slave mode, address 0x66, pins 18/19, external pullups, 400kHz
   Wire.begin(I2C_SLAVE, 0x66, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
-
+  //Wire.begin(I2C_SLAVE, 0x69, I2C_PINS_16_17, I2C_PULLUP_EXT, 400000);
   // register events
   Wire.onRequest(requestEvent);
 
@@ -70,7 +69,7 @@ void loop()
   if (temp > 180)
     temp -= 360;
 
-  u.fval[1] = temp;
+  u.fval[1] = -temp;
   /*
     Serial.print(u.fval[0], 2);
     Serial.print("-");
@@ -86,8 +85,8 @@ void loop()
 void requestEvent(void)
 {
   Wire.write(u.b, 8);
-  /*
-    for (int i = 0; i < 8; i++)
-    Wire.write(b[i]);
-  */
+
+  //for (int i = 0; i < 6; i++)
+  //  Wire.write(b[i]);
+
 }

@@ -10,7 +10,7 @@ union u_tag {
 byte b[6];
 float enc_val[6];
 long pos;
-uint8_t slave_add[2] = {0x66, 0x69}; // target Slave addresses
+uint8_t slave_add[2] = {0x66}; // target Slave addresses
 
 //------------Setup---------------
 void setup()
@@ -49,7 +49,10 @@ void loop()
   pos = (pos << 8);
   pos = pos | b[2];
   pos = (pos >> 7);
-  enc_val[0] = pos * 360.0 / PPR17;
+  enc_val[0] = 240.0 + pos * 360.0 / PPR17;
+
+  if (enc_val[0] > 180)
+    enc_val[0] -= 360;
 
   pos = b[3];
   pos = (pos << 8);
@@ -57,16 +60,19 @@ void loop()
   pos = (pos << 8);
   pos = pos | b[5];
   pos = (pos >> 7);
-  enc_val[1] = pos * 360.0 / PPR17;
+  enc_val[1] = 41.4 + pos * 360.0 / PPR17;
 
+  if (enc_val[1] > 180)
+    enc_val[1] -= 360;
 
+  enc_val[1] = -enc_val[1];
 
   digitalWrite(LED_BUILTIN, HIGH);  // LED on
 
   // Print message
   Serial.print("Reading from Slave: ");
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 1; i++) {
     // Read from Slave
     Wire.requestFrom(slave_add[i], 8); // Read from Slave (string len unknown, request full buffer)
 
@@ -84,11 +90,11 @@ void loop()
 
     }
   }
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < 4; i++)
     Serial.println(enc_val[i], 2);
 
 
   digitalWrite(LED_BUILTIN, LOW);   // LED off
-  delay(100);                       // Delay to space out tests
+  delay(10);                       // Delay to space out tests
 
 }
